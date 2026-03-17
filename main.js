@@ -1,5 +1,6 @@
 const { app, Tray, Menu, shell, dialog, nativeImage } = require('electron');
 const { autoUpdater } = require('electron-updater');
+const { pathToFileURL } = require('url');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -55,7 +56,7 @@ let tray = null;
 app.whenReady().then(async () => {
   // Start the Curatorr server
   try {
-    await import(CURATORR_INDEX);
+    await import(pathToFileURL(CURATORR_INDEX).href);
   } catch (err) {
     dialog.showErrorBox(
       'Curatorr failed to start',
