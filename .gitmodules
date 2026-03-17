@@ -1,0 +1,4 @@
+[submodule "curatorr"]
+	path = curatorr
+	url = https://github.com/mickygx/curatorr.git
+	branch = main

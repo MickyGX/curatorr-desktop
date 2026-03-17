@@ -1,0 +1,50 @@
+{
+  "name": "curatorr-desktop",
+  "version": "0.1.0",
+  "description": "Curatorr desktop wrapper",
+  "main": "main.js",
+  "scripts": {
+    "postinstall": "node scripts/setup.mjs",
+    "start": "electron .",
+    "rebuild": "electron-rebuild --module-dir ./curatorr",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "uk.ghub.curatorr",
+    "productName": "Curatorr",
+    "copyright": "Copyright © 2026",
+    "npmRebuild": false,
+    "files": [
+      "main.js",
+      "build/**",
+      "curatorr/src/**",
+      "curatorr/package.json",
+      "curatorr/node_modules/**"
+    ],
+    "win": {
+      "target": ["nsis", "portable"],
+      "icon": "build/icon.ico"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "icon": "build/icon.icns",
+      "category": "public.app-category.music"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0",
+    "@electron/rebuild": "^3.6.0"
+  }
+}
