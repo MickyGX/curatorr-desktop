@@ -47,8 +47,12 @@ Object.assign(process.env, {
 });
 
 // ── Curatorr path — works in both dev and packaged app ─────────────────────
-// When packaged (asar:false), __dirname is the resources/app dir
-const CURATORR_INDEX = path.join(__dirname, 'curatorr', 'src', 'index.js');
+// extraResources copies curatorr/ to resources/curatorr/ in packaged builds
+// In dev, it sits alongside main.js at ./curatorr/
+const CURATORR_BASE  = app.isPackaged
+  ? path.join(process.resourcesPath, 'curatorr')
+  : path.join(__dirname, 'curatorr');
+const CURATORR_INDEX = path.join(CURATORR_BASE, 'src', 'index.js');
 
 // ── App ready ──────────────────────────────────────────────────────────────
 let tray = null;

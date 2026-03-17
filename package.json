@@ -23,10 +23,13 @@
     },
     "files": [
       "main.js",
-      "build/**",
-      "curatorr/src/**",
-      "curatorr/package.json",
-      "curatorr/node_modules/**"
+      "build/**"
+    ],
+    "extraResources": [
+      {
+        "from": "curatorr",
+        "to": "curatorr"
+      }
     ],
     "win": {
       "target": ["nsis", "portable"],
