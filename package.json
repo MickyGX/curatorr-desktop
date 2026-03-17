@@ -23,7 +23,8 @@
     },
     "files": [
       "main.js",
-      "build/**"
+      "build/**",
+      "node_modules/**"
     ],
     "extraResources": [
       {
