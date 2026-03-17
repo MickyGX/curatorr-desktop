@@ -1,4 +1,5 @@
 const { app, Tray, Menu, shell, dialog, nativeImage } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -83,6 +84,11 @@ app.whenReady().then(async () => {
 
   // Open browser once server has had a moment to bind
   setTimeout(() => shell.openExternal(BASE_URL), 1500);
+
+  // Check for updates silently — notify user only when one is available
+  autoUpdater.checkForUpdatesAndNotify().catch(() => {
+    // Silently ignore update check failures (offline, dev mode, etc.)
+  });
 });
 
 // ── Second instance → focus browser ───────────────────────────────────────
