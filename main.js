@@ -45,13 +45,17 @@ Object.assign(process.env, {
   TRUST_PROXY:    'false',
 });
 
+// ── Curatorr path — works in both dev and packaged app ─────────────────────
+// When packaged (asar:false), __dirname is the resources/app dir
+const CURATORR_INDEX = path.join(__dirname, 'curatorr', 'src', 'index.js');
+
 // ── App ready ──────────────────────────────────────────────────────────────
 let tray = null;
 
 app.whenReady().then(async () => {
   // Start the Curatorr server
   try {
-    await import('./curatorr/src/index.js');
+    await import(CURATORR_INDEX);
   } catch (err) {
     dialog.showErrorBox(
       'Curatorr failed to start',

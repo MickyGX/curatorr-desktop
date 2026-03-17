@@ -15,6 +15,7 @@
     "productName": "Curatorr",
     "copyright": "Copyright © 2026",
     "npmRebuild": false,
+    "asar": false,
     "publish": {
       "provider": "github",
       "owner": "MickyGX",
