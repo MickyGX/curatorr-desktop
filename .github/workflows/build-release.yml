@@ -10,6 +10,9 @@ on:
         description: 'Version tag to release (e.g. v0.1.15)'
         required: true
 
+permissions:
+  contents: write
+
 jobs:
   build-windows:
     runs-on: windows-latest
@@ -34,4 +37,4 @@ jobs:
       - name: Build Windows installer and portable
         run: npm run dist -- --publish always
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
