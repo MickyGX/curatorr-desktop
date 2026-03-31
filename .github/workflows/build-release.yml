@@ -19,13 +19,13 @@ jobs:
 
     steps:
       - name: Checkout with submodules
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
@@ -35,6 +35,12 @@ jobs:
           ELECTRON_BUILDER_SKIP_POSTINSTALL: ''
 
       - name: Build Windows installer and portable
-        run: npm run dist -- --publish always
+        run: npm run dist -- --publish never
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+          files: dist/*.exe
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
