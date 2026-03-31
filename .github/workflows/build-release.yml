@@ -31,11 +31,21 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        env:
-          ELECTRON_BUILDER_SKIP_POSTINSTALL: ''
+
+      - name: Verify better-sqlite3 binary exists
+        run: |
+          $binary = Get-ChildItem -Path "curatorr\node_modules\better-sqlite3" -Recurse -Filter "*.node" | Select-Object -First 1
+          if (-not $binary) {
+            Write-Error "better-sqlite3 native binary not found — setup.mjs may have failed"
+            exit 1
+          }
+          Write-Host "Found binary: $($binary.FullName)"
+        shell: pwsh
 
       - name: Build Windows installer and portable
         run: npm run dist -- --publish never
+        env:
+          ELECTRON_BUILDER_SKIP_POSTINSTALL: '1'
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
