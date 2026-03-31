@@ -5,6 +5,24 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 
+// ── Early crash logging ────────────────────────────────────────────────────
+const LOG_DIR  = path.join(require('os').homedir(), 'AppData', 'Local', 'Curatorr', 'logs');
+const LOG_FILE = path.join(LOG_DIR, 'main.log');
+try { fs.mkdirSync(LOG_DIR, { recursive: true }); } catch {}
+const log = (msg) => {
+  const line = `[${new Date().toISOString()}] ${msg}\n`;
+  try { fs.appendFileSync(LOG_FILE, line); } catch {}
+  process.stdout.write(line);
+};
+process.on('uncaughtException', (err) => {
+  log(`UNCAUGHT EXCEPTION: ${err.stack || err.message}`);
+  process.exit(1);
+});
+process.on('unhandledRejection', (err) => {
+  log(`UNHANDLED REJECTION: ${err?.stack || err}`);
+});
+log('App starting...');
+
 // ── Single instance lock ───────────────────────────────────────────────────
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
@@ -60,8 +78,12 @@ let tray = null;
 app.whenReady().then(async () => {
   // Start the Curatorr server
   try {
+    log(`Loading curatorr from: ${CURATORR_INDEX}`);
+    log(`File exists: ${fs.existsSync(CURATORR_INDEX)}`);
     await import(pathToFileURL(CURATORR_INDEX).href);
+    log('Curatorr loaded successfully');
   } catch (err) {
+    log(`CURATORR LOAD ERROR: ${err.stack || err.message}`);
     dialog.showErrorBox(
       'Curatorr failed to start',
       `${err.message}\n\nCheck that all dependencies are installed.\nRun: npm run rebuild`
