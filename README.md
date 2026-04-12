@@ -51,10 +51,10 @@ If you change the desktop port via the `PORT` variable, update the redirect URI 
 Curatorr Desktop starts the bundled Curatorr server and reads configuration from:
 
 1. normal system environment variables
-2. `%APPDATA%\Curatorr\.env`
+2. `%APPDATA%\curatorr-desktop\.env`
 3. a `.env` beside the app executable, mainly useful for portable installs
 
-System environment variables take priority over `.env` files. `%APPDATA%\Curatorr\.env` is the recommended place for user-managed desktop settings because updates should not touch it.
+System environment variables take priority over `.env` files. `%APPDATA%\curatorr-desktop\.env` is the recommended place for user-managed desktop settings because updates should not touch it.
 
 Commonly useful variables:
 
