@@ -16,17 +16,17 @@ Grab the latest installer from the [Releases](https://github.com/MickyGX/curator
 - Runs silently in the system tray — right-click the icon to open or quit
 - Checks for updates automatically in the background
 
-All data is stored in `%APPDATA%\Curatorr\` — your config and database persist between updates.
+All data is stored in `%APPDATA%\curatorr-desktop\` — your config and database persist between updates.
 
 ## Spotify setup
 
-Spotify playlist import in Curatorr Desktop needs Spotify app credentials before you launch the app. The recommended desktop-specific option is a `.env` file in `%APPDATA%\Curatorr\`.
+Spotify playlist import in Curatorr Desktop needs Spotify app credentials before you launch the app. The recommended desktop-specific option is a `.env` file in `%APPDATA%\curatorr-desktop\`.
 
 1. Create an app in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard).
 2. Add this redirect URI:
    `http://localhost:7676/user-settings/spotify/callback`
 3. Curatorr Desktop will create this file automatically on first run:
-   `%APPDATA%\Curatorr\.env`
+   `%APPDATA%\curatorr-desktop\.env`
 4. Edit it and add your Spotify credentials:
 
 ```env
@@ -44,8 +44,7 @@ setx SPOTIFY_CLIENT_ID "your-client-id"
 setx SPOTIFY_CLIENT_SECRET "your-client-secret"
 ```
 
-If you change the desktop port, the redirect URI must use that same port. For example, if you set `PORT=8787`, use:
-`http://localhost:8787/user-settings/spotify/callback`
+If you change the desktop port via the `PORT` variable, update the redirect URI in your Spotify app to use that same port.
 
 ## Desktop environment variables
 
@@ -72,7 +71,7 @@ Commonly useful variables:
 
 Desktop-managed variables:
 
-- `DATA_DIR`, `CONFIG_PATH`, and `SESSION_SECRET` are managed by the desktop wrapper and stored under `%APPDATA%\Curatorr\`.
+- `DATA_DIR`, `CONFIG_PATH`, and `SESSION_SECRET` are managed by the desktop wrapper and stored under `%APPDATA%\curatorr-desktop\`.
 - `BASE_URL` is generated automatically from `localhost` plus the chosen `PORT`.
 - `NODE_ENV` is forced to `production`.
 - `TRUST_PROXY` is forced to `false` in the desktop build.
