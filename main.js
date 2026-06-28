@@ -85,6 +85,46 @@ function ensureEnvTemplate(filePath) {
   }
 }
 
+const START_HIDDEN_ARG = '--hidden';
+
+function isHiddenLaunch(argv) {
+  return Array.isArray(argv) && argv.includes(START_HIDDEN_ARG);
+}
+
+function canManageLoginStartup() {
+  return process.platform === 'win32';
+}
+
+function getLaunchAtLoginEnabled() {
+  if (!canManageLoginStartup()) return false;
+  try {
+    return app.getLoginItemSettings({ args: [START_HIDDEN_ARG] }).openAtLogin;
+  } catch (err) {
+    log(`Failed to read launch-at-login setting: ${err.message}`);
+    return false;
+  }
+}
+
+function setLaunchAtLoginEnabled(enabled) {
+  if (!canManageLoginStartup()) return false;
+  try {
+    app.setLoginItemSettings({
+      openAtLogin: Boolean(enabled),
+      args: [START_HIDDEN_ARG],
+    });
+    const nextEnabled = getLaunchAtLoginEnabled();
+    log(`Launch at login ${nextEnabled ? 'enabled' : 'disabled'}`);
+    return nextEnabled;
+  } catch (err) {
+    log(`Failed to update launch-at-login setting: ${err.message}`);
+    dialog.showErrorBox(
+      'Could not update startup setting',
+      `${err.message}\n\nTry running Curatorr normally and changing the setting again.`
+    );
+    return getLaunchAtLoginEnabled();
+  }
+}
+
 // ── Early crash logging ────────────────────────────────────────────────────
 const LOG_DIR  = path.join(require('os').homedir(), 'AppData', 'Local', 'Curatorr', 'logs');
 const LOG_FILE = path.join(LOG_DIR, 'main.log');
@@ -102,6 +142,8 @@ process.on('unhandledRejection', (err) => {
   log(`UNHANDLED REJECTION: ${err?.stack || err}`);
 });
 log('App starting...');
+const START_HIDDEN = isHiddenLaunch(process.argv);
+if (START_HIDDEN) log('Hidden startup requested; browser launch will be skipped');
 
 // ── Single instance lock ───────────────────────────────────────────────────
 const gotLock = app.requestSingleInstanceLock();
@@ -210,6 +252,22 @@ app.whenReady().then(async () => {
     { type: 'separator' },
     { label: `Running on ${BASE_URL}`, enabled: false },
     { type: 'separator' },
+    {
+      label: canManageLoginStartup()
+        ? 'Launch Curatorr at login'
+        : 'Launch at login is only available on Windows',
+      type: 'checkbox',
+      checked: getLaunchAtLoginEnabled(),
+      enabled: canManageLoginStartup(),
+      click: (menuItem) => {
+        const enabled = setLaunchAtLoginEnabled(menuItem.checked);
+        tray.setContextMenu(buildMenu());
+        if (menuItem.checked !== enabled) {
+          tray.popUpContextMenu();
+        }
+      },
+    },
+    { type: 'separator' },
     { label: 'Quit Curatorr', click: () => app.quit() },
   ]);
 
@@ -217,12 +275,16 @@ app.whenReady().then(async () => {
   tray.on('click', () => shell.openExternal(BASE_URL));
   tray.on('double-click', () => shell.openExternal(BASE_URL));
 
-  // Open browser once server has had a moment to bind
-  log(`Opening browser at ${BASE_URL} in 1.5s...`);
-  setTimeout(() => {
-    log('Firing shell.openExternal...');
-    shell.openExternal(BASE_URL);
-  }, 1500);
+  if (START_HIDDEN) {
+    log('Started in tray without opening browser');
+  } else {
+    // Open browser once server has had a moment to bind
+    log(`Opening browser at ${BASE_URL} in 1.5s...`);
+    setTimeout(() => {
+      log('Firing shell.openExternal...');
+      shell.openExternal(BASE_URL);
+    }, 1500);
+  }
 
   // Check for updates silently — notify user only when one is available
   autoUpdater.checkForUpdatesAndNotify().catch((err) => {
@@ -231,7 +293,11 @@ app.whenReady().then(async () => {
 });
 
 // ── Second instance → focus browser ───────────────────────────────────────
-app.on('second-instance', () => {
+app.on('second-instance', (_event, commandLine) => {
+  if (isHiddenLaunch(commandLine)) {
+    log('Ignored hidden second-instance launch');
+    return;
+  }
   shell.openExternal(BASE_URL);
 });
 
