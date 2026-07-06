@@ -1,6 +1,6 @@
 {
   "name": "curatorr-desktop",
-  "version": "0.1.89",
+  "version": "0.1.90",
   "description": "Curatorr desktop wrapper",
   "main": "main.js",
   "scripts": {
